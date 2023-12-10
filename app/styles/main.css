@@ -1,0 +1,9 @@
+.main-component {
+  background-color: #11270b;
+  width: 100vw; /* Set width to 100% of viewport width */
+  height: 100vh;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
