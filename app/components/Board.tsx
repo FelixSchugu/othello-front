@@ -2,6 +2,8 @@ import type { LinksFunction } from "@remix-run/node"; // or cloudflare/deno
 import styles from "~/styles/board.css";
 import { Square } from "./Square";
 import { useState } from "react";
+import { OthelloEngine } from "~/engine/OthelloEngine";
+import { TokenStatesEnum } from "~/types";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: styles }];
@@ -21,7 +23,11 @@ const initialArray = [
 export const Board = (props: any) => {
   // const [isTrue, setIsTrue] = useState<boolean>(false);
 
-  const [boardArray, setBoardArray] = useState<number[][]>(initialArray);
+  const [boardArray, setBoardArray] = useState<number[][]>(OthelloEngine.initializeBoardArray());
+
+  const handleSquareClick = (indexY: number, indexX: number, value: TokenStatesEnum) => {
+    console.log({ indexY, indexX, value });
+  };
 
   return (
     <div
@@ -33,9 +39,9 @@ export const Board = (props: any) => {
         flexDirection: "column",
       }}
     >
-      {boardArray.map((yElem, index) => (
+      {boardArray.map((yElem, indexY) => (
         <div
-          key={`arr-board-${index}`}
+          key={`arr-board-${indexY}`}
           style={{
             display: "flex",
             flexDirection: "row",
@@ -43,13 +49,15 @@ export const Board = (props: any) => {
             height: "12.5%",
           }}
         >
-          {yElem.map((xElem) => (
-            <Square />
+          {yElem.map((xElem, indexX) => (
+            <Square
+              key={`sub-elem${indexX}`}
+              tokenState={boardArray[indexY][indexX]}
+              {...{ indexX, indexY, handleSquareClick }}
+            />
           ))}
         </div>
       ))}
-      {/* <Square></Square>
-      <Square></Square> */}
     </div>
   );
 };

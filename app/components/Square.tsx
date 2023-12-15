@@ -1,7 +1,17 @@
+import { MouseEventHandler, PropsWithChildren, ReactPropTypes } from "react";
 import { TokenStatesEnum } from "~/types";
 
-export const Square = (props: any) => {
-  const handleSquareClick = (event: any) => {};
+export const Square = (
+  props: PropsWithChildren<{
+    tokenState: number;
+    handleSquareClick: (indexY: number, indexX: number, value: TokenStatesEnum) => void;
+    indexY: number;
+    indexX: number;
+  }>
+) => {
+  const handleSquareClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    props.handleSquareClick(props.indexY, props.indexX, props.tokenState);
+  };
 
   return (
     <div
@@ -14,16 +24,17 @@ export const Square = (props: any) => {
         justifyContent: "center",
         cursor: "pointer",
       }}
+      onClick={handleSquareClick}
     >
-      {props.tokenState && (
+      {props?.tokenState !== TokenStatesEnum.EMPTY && (
         <div
           style={{
             height: "70%",
             width: "70%",
             backgroundColor:
-              props.tokenStateState === TokenStatesEnum.WHITE
+              props.tokenState === TokenStatesEnum.WHITE
                 ? "lightgray"
-                : props.tokenStateState === TokenStatesEnum.BLACK
+                : props.tokenState === TokenStatesEnum.BLACK
                 ? "#333333"
                 : "",
             borderRadius: "50%",
