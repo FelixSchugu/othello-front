@@ -1,7 +1,7 @@
 import type { LinksFunction } from "@remix-run/node"; // or cloudflare/deno
 import styles from "~/styles/board.css";
 import { Square } from "./Square";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { OthelloEngine } from "~/engine/OthelloEngine";
 import { TokenStatesEnum } from "~/types";
 
@@ -9,21 +9,18 @@ export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: styles }];
 };
 
-const initialArray = [
-  [0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0],
-];
-
 export const Board = (props: any) => {
   // const [isTrue, setIsTrue] = useState<boolean>(false);
 
   const [boardArray, setBoardArray] = useState<number[][]>(OthelloEngine.initializeBoardArray());
+
+  useEffect(() => {
+    let initialArray = OthelloEngine.initializeBoardArray();
+
+    initialArray = OthelloEngine.searchAvailableForPiece(initialArray, TokenStatesEnum.BLACK);
+
+    setBoardArray(initialArray);
+  }, []);
 
   const handleSquareClick = (indexY: number, indexX: number, value: TokenStatesEnum) => {
     console.log({ indexY, indexX, value });
@@ -50,11 +47,7 @@ export const Board = (props: any) => {
           }}
         >
           {yElem.map((xElem, indexX) => (
-            <Square
-              key={`sub-elem${indexX}`}
-              tokenState={boardArray[indexY][indexX]}
-              {...{ indexX, indexY, handleSquareClick }}
-            />
+            <Square key={`sub-elem${indexX}`} tokenState={boardArray[indexY][indexX]} {...{ indexX, indexY, handleSquareClick }} />
           ))}
         </div>
       ))}

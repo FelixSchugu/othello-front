@@ -1,4 +1,4 @@
-import { MouseEventHandler, PropsWithChildren, ReactPropTypes } from "react";
+import type { PropsWithChildren } from "react";
 import { TokenStatesEnum } from "~/types";
 
 export const Square = (
@@ -22,7 +22,7 @@ export const Square = (
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        cursor: "pointer",
+        ...(props.tokenState === TokenStatesEnum.AVAILABLE_POSITION && { cursor: "pointer" }),
       }}
       onClick={handleSquareClick}
     >
@@ -36,6 +36,8 @@ export const Square = (
                 ? "lightgray"
                 : props.tokenState === TokenStatesEnum.BLACK
                 ? "#333333"
+                : props.tokenState === TokenStatesEnum.AVAILABLE_POSITION
+                ? ""
                 : "",
             borderRadius: "50%",
             border: "1px solid black",
