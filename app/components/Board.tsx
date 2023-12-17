@@ -1,29 +1,50 @@
 import type { LinksFunction } from "@remix-run/node"; // or cloudflare/deno
 import styles from "~/styles/board.css";
 import { Square } from "./Square";
-import { useEffect, useState } from "react";
-import { OthelloEngine } from "~/engine/OthelloEngine";
+import { PropsWithChildren, useEffect, useState } from "react";
 import { TokenStatesEnum } from "~/types";
+import othelloEngineSingleton from "~/engine/OthelloEngineSingleton";
+import type { TokenPiecesTypes } from "~/types";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: styles }];
 };
 
-export const Board = (props: any) => {
+export const Board = (props: PropsWithChildren<{ onTurnChange: (pieceColor: TokenStatesEnum) => void }>) => {
   // const [isTrue, setIsTrue] = useState<boolean>(false);
 
-  const [boardArray, setBoardArray] = useState<number[][]>(OthelloEngine.initializeBoardArray());
+  const [boardArray, setBoardArray] = useState<number[][]>(othelloEngineSingleton.getArray());
+  const [turnPiece, setTurnPiece] = useState<TokenPiecesTypes>(TokenStatesEnum.BLACK);
 
   useEffect(() => {
-    let initialArray = OthelloEngine.initializeBoardArray();
+    othelloEngineSingleton.searchAvailableForPiece(turnPiece);
 
-    initialArray = OthelloEngine.searchAvailableForPiece(initialArray, TokenStatesEnum.BLACK);
-
-    setBoardArray(initialArray);
+    setBoardArray(othelloEngineSingleton.getArray());
   }, []);
 
   const handleSquareClick = (indexY: number, indexX: number, value: TokenStatesEnum) => {
     console.log({ indexY, indexX, value });
+
+    othelloEngineSingleton.handlePlayerTurn(indexY, indexX, turnPiece);
+    setBoardArray(othelloEngineSingleton.getArray());
+
+    if (turnPiece === TokenStatesEnum.BLACK) {
+      setTurnPiece(TokenStatesEnum.WHITE);
+      props.onTurnChange(TokenStatesEnum.WHITE);
+    } else {
+      setTurnPiece(TokenStatesEnum.BLACK);
+      props.onTurnChange(TokenStatesEnum.BLACK);
+    }
+
+    // setTurnPiece((currentPiece) => {
+    //   if (currentPiece === TokenStatesEnum.BLACK) return TokenStatesEnum.WHITE;
+
+    //   return TokenStatesEnum.BLACK;
+    // });
+
+    othelloEngineSingleton.searchAvailableForPiece(turnPiece);
+
+    setBoardArray(othelloEngineSingleton.getArray());
   };
 
   return (

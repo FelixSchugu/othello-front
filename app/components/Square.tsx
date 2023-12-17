@@ -1,5 +1,6 @@
 import type { PropsWithChildren } from "react";
 import { TokenStatesEnum } from "~/types";
+import { Token } from "./Token";
 
 export const Square = (
   props: PropsWithChildren<{
@@ -24,27 +25,9 @@ export const Square = (
         justifyContent: "center",
         ...(props.tokenState === TokenStatesEnum.AVAILABLE_POSITION && { cursor: "pointer" }),
       }}
-      onClick={handleSquareClick}
+      {...(props.tokenState === TokenStatesEnum.AVAILABLE_POSITION && { onClick: handleSquareClick })}
     >
-      {props?.tokenState !== TokenStatesEnum.EMPTY && (
-        <div
-          style={{
-            height: "70%",
-            width: "70%",
-            backgroundColor:
-              props.tokenState === TokenStatesEnum.WHITE
-                ? "lightgray"
-                : props.tokenState === TokenStatesEnum.BLACK
-                ? "#333333"
-                : props.tokenState === TokenStatesEnum.AVAILABLE_POSITION
-                ? ""
-                : "",
-            borderRadius: "50%",
-            border: "1px solid black",
-            boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px",
-          }}
-        ></div>
-      )}
+      {props?.tokenState !== TokenStatesEnum.EMPTY && <Token tokenState={props.tokenState} />}
     </div>
   );
 };

@@ -25,7 +25,6 @@ export class OthelloEngine {
     for (let i = 0; i < tempArr.length; i++) {
       for (let j = 0; j < tempArr[i].length; j++) {
         if (tempArr[i][j] == TokenStatesEnum.EMPTY) {
-          //
           const isAvailable =
             this.searchAvailableTopDiagonal(boardArr, i + 1, j + 1, currentPiece) ||
             this.searchAvailableTop(boardArr, i + 1, j, currentPiece) ||
@@ -147,5 +146,20 @@ export class OthelloEngine {
       boardArr[startY][startX] == TokenStatesEnum.EMPTY ||
       boardArr[startY][startX] == TokenStatesEnum.AVAILABLE_POSITION
     );
+  }
+
+  static markPiece(boardArr: number[][], y: number, x: number, pieceToAdd: TokenPiecesTypes) {
+    const tempArr = [...boardArr];
+
+    tempArr[y][x] = pieceToAdd;
+    return tempArr;
+  }
+
+  static handlePlayerTurn(boardArr: number[][], y: number, x: number, pieceToAdd: TokenPiecesTypes) {
+    const tempArr = [...boardArr];
+
+    tempArr[y][x] = pieceToAdd;
+
+    
   }
 }
