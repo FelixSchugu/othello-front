@@ -28,8 +28,10 @@ class OthelloEngineSingleton {
       for (let j = 0; j < this.boardArr[i].length; j++) {
         if (this.boardArr[i][j] == TokenStatesEnum.EMPTY) {
           const isAvailable =
-            this.searchAvailableTopDiagonal(i + 1, j + 1, currentPiece) ||
-            this.searchAvailableBottomDiagonal(i - 1, j - 1, currentPiece) ||
+            this.searchAvailableFromTopLeftDiagonal(i + 1, j + 1, currentPiece) ||
+            this.searchAvailableFromTopRightDiagonal(i + 1, j - 1, currentPiece) ||
+            this.searchAvailableFromBottomRightDiagonal(i - 1, j - 1, currentPiece) ||
+            this.searchAvailableFromBottomLeftDiagonal(i - 1, j + 1, currentPiece) ||
             this.searchAvailableTop(i + 1, j, currentPiece) ||
             this.searchAvailableLeft(i, j + 1, currentPiece) ||
             this.searchAvailableRight(i, j - 1, currentPiece) ||
@@ -57,7 +59,7 @@ class OthelloEngineSingleton {
     }
   }
 
-  private searchAvailableTopDiagonal(startY: number, startX: number, pieceToFind: TokenPiecesTypes): boolean {
+  private searchAvailableFromTopLeftDiagonal(startY: number, startX: number, pieceToFind: TokenPiecesTypes): boolean {
     if (this.isNextPositionNotAvailable(startY, startX, pieceToFind)) return false;
 
     let y = startY + 1;
@@ -73,7 +75,7 @@ class OthelloEngineSingleton {
     return false;
   }
 
-  private searchAvailableBottomDiagonal(startY: number, startX: number, pieceToFind: TokenPiecesTypes): boolean {
+  private searchAvailableFromBottomRightDiagonal(startY: number, startX: number, pieceToFind: TokenPiecesTypes): boolean {
     if (this.isNextPositionNotAvailable(startY, startX, pieceToFind)) return false;
 
     let y = startY - 1;
@@ -85,6 +87,38 @@ class OthelloEngineSingleton {
 
       x--;
       y--;
+    }
+
+    return false;
+  }
+
+  private searchAvailableFromTopRightDiagonal(startY: number, startX: number, pieceToFind: TokenPiecesTypes): boolean {
+    if (this.isNextPositionNotAvailable(startY, startX, pieceToFind)) return false;
+
+    let y = startY + 1;
+    let x = startX - 1;
+
+    while (y < this.boardArr.length && x >= 0) {
+      if (this.boardArr[y][x] === TokenStatesEnum.EMPTY) return false;
+      if (this.boardArr[y][x] === pieceToFind) return true;
+      y++;
+      x--;
+    }
+
+    return false;
+  }
+
+  private searchAvailableFromBottomLeftDiagonal(startY: number, startX: number, pieceToFind: TokenPiecesTypes): boolean {
+    if (this.isNextPositionNotAvailable(startY, startX, pieceToFind)) return false;
+
+    let y = startY;
+    let x = startX;
+
+    while (y >= 0 && x < this.boardArr.length) {
+      if (this.boardArr[y][x] === TokenStatesEnum.EMPTY) return false;
+      if (this.boardArr[y][x] === pieceToFind) return true;
+      y--;
+      x++;
     }
 
     return false;
@@ -171,22 +205,113 @@ class OthelloEngineSingleton {
   //
   private colorizePieces(y: number, x: number, currentPiece: number, pieceToColorize: TokenPiecesTypes) {
     this.colorizeFromTop(y + 1, x, currentPiece, pieceToColorize);
+    this.colorizeFromBottom(y - 1, x, currentPiece, pieceToColorize);
+    this.colorizeFromLeft(y, x + 1, currentPiece, pieceToColorize);
+    this.colorizeFromRight(y, x - 1, currentPiece, pieceToColorize);
+    this.colorizeFromTopLeftDiagonal(y + 1, x + 1, currentPiece, pieceToColorize);
+    this.colorizeFromTopRightDiagonal(y + 1, x - 1, currentPiece, pieceToColorize);
+    this.colorizeFromBottomLeftDiagonal(y - 1, x + 1, currentPiece, pieceToColorize);
+    this.colorizeFromBottomRightDiagonal(y - 1, x - 1, currentPiece, pieceToColorize);
   }
 
   private colorizeFromTop(startY: number, startX: number, oppositePiece: TokenPiecesTypes, currentPiece: TokenPiecesTypes) {
+    if (!this.searchAvailableTop(startY, startX, currentPiece)) return;
+
     let y = startY;
-    // console.log({ startY, arr: this.boardArr[startY][x], oppositePiece });
     while (y < this.boardArr.length && this.boardArr[y][startX] === oppositePiece) {
-      this.boardArr[startY][startX] = currentPiece;
+      this.boardArr[y][startX] = currentPiece;
       y++;
     }
   }
 
-  private colorizeHorizontal(pieceToColorize: TokenPiecesTypes) {}
+  private colorizeFromBottom(startY: number, startX: number, oppositePiece: TokenPiecesTypes, currentPiece: TokenPiecesTypes) {
+    if (!this.searchAvailableBottom(startY, startX, currentPiece)) return;
 
-  private colorizeLeftRightDiagonal(pieceToColorize: TokenPiecesTypes) {}
+    let y = startY;
 
-  private colorizeRightLeftDiagonal(pieceToColorize: TokenPiecesTypes) {}
+    while (y >= 0 && this.boardArr[y][startX] === oppositePiece) {
+      this.boardArr[y][startX] = currentPiece;
+      y--;
+    }
+  }
+
+  private colorizeFromLeft(startY: number, startX: number, oppositePiece: TokenPiecesTypes, currentPiece: TokenPiecesTypes) {
+    if (!this.searchAvailableLeft(startY, startX, currentPiece)) return;
+
+    let x = startX;
+
+    while (x < this.boardArr.length && this.boardArr[startY][x] === oppositePiece) {
+      this.boardArr[startY][x] = currentPiece;
+      x++;
+    }
+  }
+
+  private colorizeFromRight(startY: number, startX: number, oppositePiece: TokenPiecesTypes, currentPiece: TokenPiecesTypes) {
+    if (!this.searchAvailableRight(startY, startX, currentPiece)) return;
+
+    let x = startX;
+
+    while (x >= 0 && this.boardArr[startY][x] === oppositePiece) {
+      this.boardArr[startY][x] = currentPiece;
+      x--;
+    }
+  }
+
+  // From top-left to bottom-right
+  private colorizeFromTopLeftDiagonal(startY: number, startX: number, oppositePiece: TokenPiecesTypes, currentPiece: TokenPiecesTypes) {
+    if (!this.searchAvailableFromTopLeftDiagonal(startY, startX, currentPiece)) return;
+
+    let y = startY;
+    let x = startX;
+
+    while (x < this.boardArr.length && y < this.boardArr.length && this.boardArr[y][x] === oppositePiece) {
+      this.boardArr[y][x] = currentPiece;
+      y++;
+      x++;
+    }
+  }
+
+  // From top-right to bottom-left
+  private colorizeFromTopRightDiagonal(startY: number, startX: number, oppositePiece: TokenPiecesTypes, currentPiece: TokenPiecesTypes) {
+    if (!this.searchAvailableFromTopRightDiagonal(startY, startX, currentPiece)) return;
+
+    let y = startY;
+    let x = startX;
+
+    while (x >= 0 && y < this.boardArr.length && this.boardArr[y][x] === oppositePiece) {
+      this.boardArr[y][x] = currentPiece;
+      y++;
+      x--;
+    }
+  }
+
+  // From bottom-left to top-right
+  private colorizeFromBottomLeftDiagonal(startY: number, startX: number, oppositePiece: TokenPiecesTypes, currentPiece: TokenPiecesTypes) {
+    if (!this.searchAvailableFromBottomLeftDiagonal(startY, startX, currentPiece)) return;
+
+    let y = startY;
+    let x = startX;
+
+    while (y >= 0 && x < this.boardArr.length && this.boardArr[y][x] === oppositePiece) {
+      this.boardArr[y][x] = currentPiece;
+      y--;
+      x++;
+    }
+  }
+
+  // From bottom-right to top-left
+  private colorizeFromBottomRightDiagonal(startY: number, startX: number, oppositePiece: TokenPiecesTypes, currentPiece: TokenPiecesTypes) {
+    if (!this.searchAvailableFromBottomRightDiagonal(startY, startX, currentPiece)) return;
+
+    let y = startY;
+    let x = startX;
+
+    while (y >= 0 && x < this.boardArr.length && this.boardArr[y][x] === oppositePiece) {
+      this.boardArr[y][x] = currentPiece;
+      y--;
+      x--;
+    }
+  }
 }
 
 const othelloEngineSingleton = OthelloEngineSingleton.Instance;
