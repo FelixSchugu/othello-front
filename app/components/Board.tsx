@@ -16,11 +16,17 @@ export const Board = (props: PropsWithChildren<{ onTurnChange: (pieceColor: Toke
   const [boardArray, setBoardArray] = useState<number[][]>(othelloEngineSingleton.getArray());
   const [turnPiece, setTurnPiece] = useState<TokenPiecesTypes>(TokenStatesEnum.BLACK);
 
+  // useEffect(() => {
+  //   othelloEngineSingleton.searchAvailableForPiece(turnPiece);
+
+  //   setBoardArray(othelloEngineSingleton.getArray());
+  // }, []);
+
   useEffect(() => {
     othelloEngineSingleton.searchAvailableForPiece(turnPiece);
 
     setBoardArray(othelloEngineSingleton.getArray());
-  }, []);
+  }, [turnPiece]);
 
   const handleSquareClick = (indexY: number, indexX: number, value: TokenStatesEnum) => {
     console.log({ indexY, indexX, value });
@@ -35,16 +41,6 @@ export const Board = (props: PropsWithChildren<{ onTurnChange: (pieceColor: Toke
       setTurnPiece(TokenStatesEnum.BLACK);
       props.onTurnChange(TokenStatesEnum.BLACK);
     }
-
-    // setTurnPiece((currentPiece) => {
-    //   if (currentPiece === TokenStatesEnum.BLACK) return TokenStatesEnum.WHITE;
-
-    //   return TokenStatesEnum.BLACK;
-    // });
-
-    othelloEngineSingleton.searchAvailableForPiece(turnPiece);
-
-    setBoardArray(othelloEngineSingleton.getArray());
   };
 
   return (

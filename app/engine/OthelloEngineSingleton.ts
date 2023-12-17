@@ -21,6 +21,7 @@ class OthelloEngineSingleton {
     return this._instance || (this._instance = new this());
   }
 
+  // Search and mark available pieces section
   public searchAvailableForPiece(currentPiece: TokenPiecesTypes) {
     this.cleanOldAvailablePositions();
     for (let i = 0; i < this.boardArr.length; i++) {
@@ -28,6 +29,7 @@ class OthelloEngineSingleton {
         if (this.boardArr[i][j] == TokenStatesEnum.EMPTY) {
           const isAvailable =
             this.searchAvailableTopDiagonal(i + 1, j + 1, currentPiece) ||
+            this.searchAvailableBottomDiagonal(i - 1, j - 1, currentPiece) ||
             this.searchAvailableTop(i + 1, j, currentPiece) ||
             this.searchAvailableLeft(i, j + 1, currentPiece) ||
             this.searchAvailableRight(i, j - 1, currentPiece) ||
@@ -66,6 +68,23 @@ class OthelloEngineSingleton {
 
       x++;
       y++;
+    }
+
+    return false;
+  }
+
+  private searchAvailableBottomDiagonal(startY: number, startX: number, pieceToFind: TokenPiecesTypes): boolean {
+    if (this.isNextPositionNotAvailable(startY, startX, pieceToFind)) return false;
+
+    let y = startY - 1;
+    let x = startX - 1;
+
+    while (y >= 0 && x >= 0) {
+      if (this.boardArr[y][x] === TokenStatesEnum.EMPTY) return false;
+      if (this.boardArr[y][x] === pieceToFind) return true;
+
+      x--;
+      y--;
     }
 
     return false;
@@ -141,7 +160,33 @@ class OthelloEngineSingleton {
 
   public handlePlayerTurn(y: number, x: number, pieceToAdd: TokenPiecesTypes) {
     this.boardArr[y][x] = pieceToAdd;
+
+    const oppositePiece = pieceToAdd === TokenStatesEnum.BLACK ? TokenStatesEnum.WHITE : TokenStatesEnum.BLACK;
+
+    this.colorizePieces(y, x, oppositePiece, pieceToAdd);
   }
+
+  // Colorize tokens section
+  //
+  //
+  private colorizePieces(y: number, x: number, currentPiece: number, pieceToColorize: TokenPiecesTypes) {
+    this.colorizeFromTop(y + 1, x, currentPiece, pieceToColorize);
+  }
+
+  private colorizeFromTop(startY: number, startX: number, oppositePiece: TokenPiecesTypes, currentPiece: TokenPiecesTypes) {
+    let y = startY;
+    // console.log({ startY, arr: this.boardArr[startY][x], oppositePiece });
+    while (y < this.boardArr.length && this.boardArr[y][startX] === oppositePiece) {
+      this.boardArr[startY][startX] = currentPiece;
+      y++;
+    }
+  }
+
+  private colorizeHorizontal(pieceToColorize: TokenPiecesTypes) {}
+
+  private colorizeLeftRightDiagonal(pieceToColorize: TokenPiecesTypes) {}
+
+  private colorizeRightLeftDiagonal(pieceToColorize: TokenPiecesTypes) {}
 }
 
 const othelloEngineSingleton = OthelloEngineSingleton.Instance;
